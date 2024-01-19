@@ -1,0 +1,102 @@
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+
+public class xkcdpwgen {
+  public static void main(String[] args) throws FileNotFoundException {
+    ArrayList<String> tokens = new ArrayList<>();
+    Random rand = new Random();
+
+    int w = 4;
+    int c = 0;
+    int n = 0;
+    int s = 0;
+
+    for (int i = 0; i < args.length; i++) {
+      switch (args[i]) {
+      case "-h":
+      case "--help":
+        System.out
+            .println("This program generates passwords:\n" + "-h or --help      Display this help"
+                + "-w or --words     include WORDS words in the password\n"
+                + "-c or --caps      capitalize the first letter of CAPS random words\n"
+                + "-n or --numbers   insert NUMBERS random numbers in the password\n"
+                + "-s or --symbols   insert SYMBOLS random symbols in the password");
+        break;
+      case "-w":
+      case "--words":
+        w = Integer.parseInt(args[++i]);
+        break;
+      case "-c":
+      case "--caps":
+        c = Integer.parseInt(args[++i]);
+        break;
+      case "-n":
+      case "--numbers":
+        n = Integer.parseInt(args[++i]);
+        break;
+      case "-s":
+      case "--symbols":
+        s = Integer.parseInt(args[++i]);
+        break;
+      default:
+        throw new IllegalArgumentException("Invalid argument: " + args[i]);
+      }
+    }
+
+    // -w or --words
+    ArrayList<String> words = new ArrayList<>();
+    Scanner input = new Scanner(new File("words.txt"));
+    while (input.hasNextLine()) {
+      words.add(input.nextLine());
+    }
+    for (int i = 0; i < w; i++) {
+      int ind = rand.nextInt(words.size());
+      tokens.add(words.get(ind));
+      words.remove(ind);
+    }
+
+    // -c or --caps
+    for (int i = 0; i < c; i++) {
+      int ind = rand.nextInt(w);
+      if ((tokens.get(ind).charAt(0) >= 'a') && (tokens.get(ind).charAt(0) <= 'z')) {
+        char fc = Character.toUpperCase(tokens.get(ind).charAt(0));
+        tokens.set(ind, fc + tokens.get(ind).substring(1));
+      }
+      else {
+        i--;
+      }
+    }
+
+    // -n or --numbers
+    for (int i = 0; i < n; i++) {
+      int ind = rand.nextInt(tokens.size() + 1);
+      int randDigit = rand.nextInt(10);
+      tokens.add(ind, String.valueOf(randDigit));
+    }
+
+    // -s or --symbols
+    String symbols = "~!@#$%^&*.:;";
+    for (int i = 0; i < s; i++) {
+      int ind = rand.nextInt(tokens.size() + 1);
+      int randSymbInd = rand.nextInt(symbols.length());
+      char randSymb = symbols.charAt(randSymbInd);
+      tokens.add(ind, String.valueOf(randSymb));
+    }
+
+    for (String token : tokens) {
+      System.out.print(token);
+    }
+    System.out.println();
+
+  }
+}
+
+
+
+
+
+
